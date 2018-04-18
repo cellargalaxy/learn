@@ -4,6 +4,11 @@ package reflect;
  * Created by cellargalaxy on 17-10-21.
  */
 public class People implements HelloSay{
+	
+	static {
+		System.out.println("执行了People的静态块");
+	}
+	
 	private String name;
 	private int age;
 	

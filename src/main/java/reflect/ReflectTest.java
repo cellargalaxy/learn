@@ -8,8 +8,25 @@ import java.lang.reflect.*;
  */
 public class ReflectTest {
 	
-	public static void main(String[] args) {
-		test11();
+	public static void main(String[] args) throws ClassNotFoundException {
+		test71();
+	}
+	
+	/**
+	 * Class.forName与classLoader的区别
+	 */
+	private static void test13() throws ClassNotFoundException {
+		ClassLoader classLoader=ClassLoader.getSystemClassLoader();
+		Class clazz=classLoader.loadClass("reflect.People");
+		System.out.println("classLoader加载"+clazz);
+	}
+	
+	/**
+	 * Class.forName与classLoader的区别
+	 */
+	private static void test12() throws ClassNotFoundException {
+		Class clazz=Class.forName("reflect.People");
+		System.out.println("Class.forName加载"+clazz);
 	}
 	
 	/**
@@ -70,6 +87,23 @@ public class ReflectTest {
 			String priv = Modifier.toString(mo);
 			Class<?> type = field.getType();
 			System.out.println(priv + " " + type.getName() + " " + field.getName());
+		}
+	}
+	
+	/**
+	 * 获取方法入参名字，需jdk8或以上
+	 * https://juejin.im/entry/591946872f301e006bb32078
+	 */
+	private static void test71(){
+		Class<?> clazz = People.class;
+		try {
+			Method method = clazz.getMethod("sayHello", String.class, int.class);
+			Parameter[] params = method.getParameters();
+			for(Parameter parameter : params){
+				System.out.println(parameter.getName());
+			}
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
 		}
 	}
 	
