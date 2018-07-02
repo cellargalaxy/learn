@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <title>表格demo</title>
+</head>
+<body>
+<div>
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>第一列</th>
+            <th>第二列</th>
+            <th>操作列</th>
+        </tr>
+        </thead>
+        <tbody id="table-tbody">
+        <tr>
+            <td>
+                <input type="text" class="form-control" placeholder="第一列" v-model="data.first"/>
+            </td>
+            <td>
+                <select class="form-control" v-model="data.second">
+                    <option v-for="selectData in selectDatas" v-text="selectData.name"
+                            :value="selectData.value"></option>
+                </select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-success" @click="addData">添加</button>
+            </td>
+        </tr>
+        <tr v-for="(data,index) in datas">
+            <td>
+                <input type="text" class="form-control" placeholder="第一列"
+                       v-bind:v-bind:value="data.first"
+                       v-model="datas[index].first"/>
+            </td>
+            <td>
+                <select class="form-control" v-bind:v-bind:value="data.second" v-model="datas[index].second">
+                    <option v-for="selectData in selectDatas" v-text="selectData.name"
+                            :value="selectData.value"></option>
+                </select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-warning" @click="updateData(index)">修改</button>
+                <button type="button" class="btn btn-danger" @click="deleteData(index)">删除</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+<script>
+    var datas =
+        [
+            {first: '数据1', second: 101},
+            {first: '数据2', second: 102},
+            {first: '数据3', second: 103},
+        ];
+    var selectDatas =
+        [
+            {name: '选择1', value: 101},
+            {name: '选择2', value: 102},
+            {name: '选择3', value: 103},
+        ];
+
+    // var tableVue = createTableVue();
+    // tableVue.loadData(datas);
+
+    renderTable(datas, selectDatas);
+
+    //--------------------------//
+
+    //jq渲染表格
+    function renderTable(datas, selectDatas) {
+        var tableTbody = $('#table-tbody');//获取tbody
+        $formTr = tableTbody.find('tr').first();//获取第一个即表单的tr
+        $tr = $formTr.next();//获取表单tr的下一个tr作为模板
+        tableTbody.empty();//清空tbody
+
+        var select = $formTr.find('select');
+        renderSelect(select, selectDatas, -1);
+        var button = $formTr.find('button');
+        button.click(function () {//给按钮设定点击事件
+            var tr = $(this).parent().parent();//获取按钮的爷爷节点，即tr
+            var data = getFormData(tr);
+            alert('使用jq添加数据：' + data.first + ',' + data.second);
+            datas.push(data);//往datas里添加数据
+            cleanFormData($formTr);
+            renderTable(datas, selectDatas);//修改数据后再次渲染
+        });
+        tableTbody.append($formTr);//添加到tbody里
+
+        for (var i = 0; i < datas.length; i++) {
+            var tr = $tr.clone();//克隆一个tr
+            var input = tr.find('input');//获取tr下面的input
+            input.val(datas[i].first);//给input设置值
+            var select = tr.find('select');
+            renderSelect(select, selectDatas, datas[i].second);
+            var buttons = tr.find('button');//获取全部按钮
+            var updateButton = buttons.first();//第一个按钮
+            var deleteButton = updateButton.next();//第二个按钮
+            updateButton.click(function () {//给按钮设定点击事件
+                var tr = $(this).parent().parent();//获取按钮的爷爷节点，即tr
+                var input = tr.find('input');
+                var select = tr.find('select');
+                alert('使用更新第' + (tr.prevAll().length) + '行，数据为：' + input.val() + ',' + select.val());//获取input和select的值
+                datas[tr.prevAll().length - 1].first = input.val();
+                datas[tr.prevAll().length - 1].second = select.val();
+                renderTable(datas, selectDatas);
+            });
+            deleteButton.click(function () {//给按钮设定点击事件
+                var tr = $(this).parent().parent();//获取按钮的爷爷节点，即tr
+                var input = tr.find('input');
+                var select = tr.find('select');
+                alert('使用jq删除第' + (tr.prevAll().length) + '行，数据为：' + input.val() + ',' + select.val());//获取input和select的值
+                datas.splice(tr.prevAll().length - 1, 1);//从下标[第一个参数]开始，删除[第二个参数]个元素
+                renderTable(datas, selectDatas);
+            });
+            tableTbody.append(tr);//添加到tbody里
+        }
+    }
+
+    //jq渲染下拉框，与renderTable()相似
+    function renderSelect(select, selectDatas, defaultValue) {
+        $option = select.find('option').first();
+        select.empty();
+        for (var i = 0; i < selectDatas.length; i++) {
+            var option = $option.clone();
+            option.text(selectDatas[i].name);
+            option.val(selectDatas[i].value);
+            if (selectDatas[i].value == defaultValue) {
+                option.attr('selected', 'selected');
+            }
+            select.append(option);
+        }
+    }
+
+    //从表单里获取要添加的数据对象
+    function getFormData(formTr) {
+        var input = formTr.find('input');
+        var select = formTr.find('select');
+        return {first: input.val(), second: select.val()};
+    }
+
+    //清理表单
+    function cleanFormData(formTr) {
+        formTr.find('input').val('');
+        formTr.find('select').val(-1);
+    }
+
+    //---------------------//
+    //vue渲染表格
+    function createTableVue() {
+        var vue = new Vue({
+            el: '#table-tbody',//设置vue的id
+            data: {
+                selectDatas: [],//下拉框的数据
+                datas: [],//表格数据
+                data: {first: null, second: -1}
+            },
+            created: function () {//vue创建时会执行
+                this.selectDatas = selectDatas;
+            },
+            methods: {//vue的方法
+                loadData(datas) {//加载表格数据
+                    this.datas = datas;
+                },
+                addData: function () {//点击新增按钮时调用的函数
+                    alert('使用vue新增数据：' + this.data.first + ',' + this.data.second);
+                    this.datas.push(this.data);
+                    this.data = {first: null, second: -1};
+                },
+                deleteData: function (index) {//点击删除按钮时调用的函数
+                    alert('使用vue删除第' + (index + 1) + '行，数据为：' + this.datas[index].first + ',' + this.datas[index].second);
+                    this.datas.splice(index, 1);
+                },
+                updateData: function (index) {//点击修改按钮时调用的函数
+                    alert('使用vue修改第' + (index + 1) + '行，数据为：' + this.datas[index].first + ',' + this.datas[index].second);
+                }
+            }
+        });
+        return vue;
+    }
+</script>
+
+</html>
