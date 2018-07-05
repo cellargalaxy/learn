@@ -11,6 +11,8 @@ public class BpNeuro {
 	private final double step;
 	private final double[][] inputHideWeightss;
 	private final double[][] hideOutputWeightss;
+	private final double[] inputHideCs;
+	private final double[] hideOutputCs;
 
 	public BpNeuro(int inputLen, int outputLen, double step) {
 		this(inputLen, inputLen, outputLen, step);
@@ -30,6 +32,8 @@ public class BpNeuro {
 		//out1  w11   w12
 		//out2  w21   w22
 		hideOutputWeightss = new double[outputLen][hideLen];
+		inputHideCs = new double[hideLen];
+		hideOutputCs = new double[outputLen];
 
 		for (int i = 0; i < inputHideWeightss.length; i++) {
 			for (int j = 0; j < inputHideWeightss[i].length; j++) {
@@ -40,6 +44,12 @@ public class BpNeuro {
 			for (int j = 0; j < hideOutputWeightss[i].length; j++) {
 				hideOutputWeightss[i][j] = Math.random();
 			}
+		}
+		for (int i = 0; i < inputHideCs.length; i++) {
+			inputHideCs[i] = Math.random();
+		}
+		for (int i = 0; i < hideOutputCs.length; i++) {
+			hideOutputCs[i] = Math.random();
 		}
 	}
 
@@ -80,7 +90,7 @@ public class BpNeuro {
 	private double[] predictHideValues(double[] inputValues) {
 		double[] hideValues = new double[hideLen];
 		for (int i = 0; i < hideValues.length; i++) {
-			hideValues[i] = predict(inputValues, inputHideWeightss[i]);
+			hideValues[i] = predict(inputValues, inputHideWeightss[i], inputHideCs[i]);
 		}
 		return hideValues;
 	}
@@ -88,17 +98,17 @@ public class BpNeuro {
 	private double[] predictOutputValues(double[] hideValues) {
 		double[] outputValues = new double[outputLen];
 		for (int i = 0; i < outputValues.length; i++) {
-			outputValues[i] = predict(hideValues, hideOutputWeightss[i]);
+			outputValues[i] = predict(hideValues, hideOutputWeightss[i], hideOutputCs[i]);
 		}
 		return outputValues;
 	}
 
-	private double predict(double[] inputValues, double[] weights) {
+	private double predict(double[] inputValues, double[] weights, double c) {
 		double sum = 0;
 		for (int i = 0; i < inputValues.length; i++) {
 			sum += inputValues[i] * weights[i];
 		}
-		return activation(sum);
+		return activation(sum + c);
 	}
 
 	private double activation(double d) {
