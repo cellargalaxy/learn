@@ -8,59 +8,77 @@ import java.awt.*;
  * @time 2018/7/5
  */
 public class DisplayNeuro extends javax.swing.JPanel {
+	private static final int SIDE_LENGTH = 200;
+	private static final double start = 0.1;
+	private static final double step = 0.001;
+	private static final double end = 2;
 
-	public static final int SIDE_LENGTH = 200;
-
-	TestNeuro testNeuro;
-	BpNeuro bpNeuro;
+	OneFit oneFit;
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		DisplayNeuro dn = new DisplayNeuro();
+
+		double[][][] datas = new double[10000][2][];
+		for (int i = 0; i < datas.length; i++) {
+			datas[i][0] = new double[]{Math.random() * (end - start) + start};
+			datas[i][1] = new double[]{funcA(datas[i][0][0])};
+		}
+		dn.oneFit = new OneFitNeuro(new MyNeuro(datas, 1, 1, 1));
+
 		JFrame jFrame = new JFrame();
-		jFrame.setBounds(100, 100, 300, 300);
+		jFrame.setBounds(100, 100, 600, 600);
 		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		jFrame.add(dn);
 		jFrame.setVisible(true);
 
-		dn.n1();
+		n3(dn);
+
 	}
 
-	public void n1() {
-		TestNeuro testNeuro = new TestNeuro(1, 20);
-		this.testNeuro = testNeuro;
-		this.repaint();
-		for (int i = 0; i < 100000000; i++) {
-			double[] input = new double[1];
-			input[0] = Math.random() / 2 + 0.25;
-			double expectedOutput = (Math.sin(3.14 * (input[0] - 0.25) * 2 * 4) + 1) / 8 * 3 + 0.125;
-			testNeuro.trainOnce(input, expectedOutput);
-
-			if (i % 100000 == 0) {
-				System.out.println("input please ");
-				this.repaint();
+	public static void n3(DisplayNeuro dn) {
+		for (int i = 0; i < 100000; i++) {
+			for (int i1 = 0; i1 < 100000; i1++) {
+				double[] inputValues = new double[]{Math.random() * (end - start) + start};
+				double targetValue = funcA(inputValues[0]);
+				dn.oneFit.trainOne(inputValues, targetValue);
 			}
+			System.out.println("训练一批");
+			dn.repaint();
 		}
 	}
 
-	public void n2() {
-		BpNeuro bpNeuro = new BpNeuro(1, 1, 0.05);
-		this.bpNeuro = bpNeuro;
-		this.repaint();
-		for (int i = 0; i < 100000000; i++) {
-			double[] input = new double[1];
-			input[0] = Math.random() / 2 + 0.25;
-			double expectedOutput = (Math.sin(3.14 * (input[0] - 0.25) * 2 * 4) + 1) / 8 * 3 + 0.125;
-			bpNeuro.train(input, new double[]{expectedOutput});
-
-			if (i % 100000 == 0) {
-				System.out.println("input please ");
-				this.repaint();
+	public static void n2(DisplayNeuro dn) {
+		dn.oneFit = new OneFitNeuro(new BpNeuro(1, 5, 1));
+		for (int i = 0; i < 100000; i++) {
+			for (int i1 = 0; i1 < 10000; i1++) {
+				double[] inputValues = new double[]{Math.random() * (end - start) + start};
+				double targetValue = funcA(inputValues[0]);
+				dn.oneFit.trainOne(inputValues, targetValue);
 			}
+			dn.repaint();
 		}
+	}
+
+	public static void n1(DisplayNeuro dn) {
+		double[][][] datas = new double[10000][2][];
+		for (int i = 0; i < datas.length; i++) {
+			datas[i][0] = new double[]{Math.random() * (end - start) + start};
+			datas[i][1] = new double[]{funcA(datas[i][0][0])};
+		}
+		OneFitNeuroBuilder oneFitNeuroBuilder = new OneFitNeuroBuilder();
+		dn.oneFit = oneFitNeuroBuilder.createOneFit(datas);
+	}
+
+	private static double funcA(double d) {
+		return activation(fun(d));
+	}
+
+	static double fun(double d) {
+		return (Math.sin(4 * 3.14 * (d + 0.5)) - 4);
+//		return (Math.sin(4 * 3.14 * (d + 0.5)) - 4) / (Math.cos(d + 0.5) * Math.tan(d + 0.5));
 	}
 
 	@Override
@@ -68,17 +86,17 @@ public class DisplayNeuro extends javax.swing.JPanel {
 		// TODO Auto-generated method stub
 		super.paint(arg0);
 
-		for (double x = 0.25; x < 0.75; x += 0.005) {
-			double[] input = new double[1];
-			input[0] = x;
-			double y;
-			if (testNeuro != null) {
-				y = testNeuro.predict(input);
-			} else {
-				y = bpNeuro.predict(input)[0];
-			}
-			arg0.fillRect((int) (x * SIDE_LENGTH), (int) ((1 - y) * SIDE_LENGTH), 1, 1);
+		for (double x = start; x < end; x += step) {
+			double target = funcA(x);
+			double output = oneFit.predict(new double[]{x});
+//			System.out.println(target + " : " + output);
+			arg0.fillRect((int) (x * SIDE_LENGTH), (int) (target * SIDE_LENGTH * 10) + 100, 1, 1);
+			arg0.fillRect((int) (x * SIDE_LENGTH), (int) (output * SIDE_LENGTH * 10) + 100, 1, 1);
 		}
+	}
+
+	static double activation(double d) {
+		return 1 / (1 + Math.pow(Math.E, -d));
 	}
 }
 
