@@ -28,6 +28,7 @@ public class MyNeuro implements Neuro {
 		}
 
 		OneFitNeuroBuilder oneFitNeuroBuilder = new OneFitNeuroBuilder();
+
 		for (int hideIndex = 0; hideIndex < intputHideOneFits.length; hideIndex++) {
 			double[][][] dss = new double[datas.length][2][];
 			for (int dataIndex = 0; dataIndex < dss.length; dataIndex++) {
@@ -43,7 +44,7 @@ public class MyNeuro implements Neuro {
 			double[][][] dss = new double[datas.length][2][];
 			for (int dataIndex = 0; dataIndex < dss.length; dataIndex++) {
 				dss[dataIndex][0] = hideValues[dataIndex];
-				dss[dataIndex][1] = datas[dataIndex][1];
+				dss[dataIndex][1] = new double[]{datas[dataIndex][1][outputIndex]};
 			}
 			hideOutputOneFits[outputIndex] = oneFitNeuroBuilder.createOneFit(dss);
 

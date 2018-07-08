@@ -1,6 +1,5 @@
 package neuro;
 
-import java.util.Arrays;
 
 /**
  * @author cellargalaxy
@@ -10,14 +9,14 @@ import java.util.Arrays;
  * https://www.cnblogs.com/charlotte77/p/5629865.html
  */
 public class BpNeuro implements Neuro {
-	private final int inputLen;
-	private final int hideLen;
-	private final int outputLen;
-	private final double[][] inputHideWeightss;
-	private final double[][] hideOutputWeightss;
-	private final double[] inputHideCs;
-	private final double[] hideOutputCs;
-	private final double step;
+	public final int inputLen;
+	public final int hideLen;
+	public final int outputLen;
+	public final double[][] inputHideWeightss;
+	public final double[][] hideOutputWeightss;
+	public final double[] inputHideCs;
+	public final double[] hideOutputCs;
+	public final double step;
 
 	public BpNeuro(int inputLen, int hideLen, int outputLen) {
 		this(inputLen, hideLen, outputLen, 1.0 / hideLen);
@@ -118,7 +117,6 @@ public class BpNeuro implements Neuro {
 			factors[outputIndex] = (targetValues[outputIndex] - outputValues[outputIndex]) * outputValues[outputIndex] * (1 - outputValues[outputIndex]);
 		}
 
-
 		double[] errers = new double[inputValues.length];
 		for (int inputIndex = 0; inputIndex < errers.length; inputIndex++) {
 			for (int outputIndex = 0; outputIndex < outputLen; outputIndex++) {
@@ -129,9 +127,6 @@ public class BpNeuro implements Neuro {
 				errers[inputIndex] += factors[outputIndex] * errorHide;
 			}
 		}
-
-//		System.out.println(Arrays.toString(errers));
-
 		return errers;
 	}
 
@@ -165,35 +160,5 @@ public class BpNeuro implements Neuro {
 
 	private double activation(double d) {
 		return 1 / (1 + Math.pow(Math.E, -d));
-	}
-
-	////
-
-	public int getInputLen() {
-		return inputLen;
-	}
-
-	public int getHideLen() {
-		return hideLen;
-	}
-
-	public int getOutputLen() {
-		return outputLen;
-	}
-
-	public double[][] getInputHideWeightss() {
-		return inputHideWeightss;
-	}
-
-	public double[][] getHideOutputWeightss() {
-		return hideOutputWeightss;
-	}
-
-	public double[] getInputHideCs() {
-		return inputHideCs;
-	}
-
-	public double[] getHideOutputCs() {
-		return hideOutputCs;
 	}
 }

@@ -14,7 +14,7 @@ public class OneFitNeuroBuilder implements OneFitBuilder<OneFitNeuro> {
 	public OneFitNeuro createOneFit(double[][][] datas) {
 		LinkedList<BpNeuroEvolution> bpNeuroEvolutions = new LinkedList<>();
 		for (int hideLen = 5; hideLen < 100; hideLen += 5) {
-			bpNeuroEvolutions.add(new BpNeuroEvolution(new BpNeuro(1, hideLen, 1)));
+			bpNeuroEvolutions.add(new BpNeuroEvolution(new BpNeuro(datas[0][0].length, hideLen, 1)));
 		}
 		int evolutionTimes = EVOLUTION_TOTAL_TIMES / bpNeuroEvolutions.size();
 
@@ -47,7 +47,6 @@ public class OneFitNeuroBuilder implements OneFitBuilder<OneFitNeuro> {
 				iterator.remove();
 			}
 		} while (bpNeuroEvolutions.size() > 1);
-
 		BpNeuroEvolution bpNeuroEvolution = bpNeuroEvolutions.getFirst();
 		return bpNeuroEvolution;
 	}
