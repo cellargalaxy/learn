@@ -31,7 +31,7 @@ public class DisplayNeuro extends javax.swing.JPanel {
 		}
 //		dn.oneFit = new OneFitNeuro(new BpNeuro(1,10,1));
 //		dn.autoNeuro=new AutoNeuro2(1,10,1);
-		dn.oneFit = new OneFitNeuro(new MyNeuro(datas, 1, 5, 1));
+		dn.oneFit = new OneFitNeuro(new BpNeuro(1, 5, 1));
 
 		JFrame jFrame = new JFrame();
 		jFrame.setBounds(100, 100, 600, 600);
@@ -51,10 +51,10 @@ public class DisplayNeuro extends javax.swing.JPanel {
 		for (int i = 0; i < 100000; i++) {
 			for (int i1 = 0; i1 < 100000; i1++) {
 				double[] inputValues = new double[]{Math.random() * (end - start) + start};
-				double targetValue = funcA(inputValues[0]);
+				double targetValue = fun(inputValues[0]);
 				dn.oneFit.trainOne(inputValues, targetValue);
 			}
-			System.out.println("训练一批");
+			System.out.println("训练" + i + "批");
 			dn.repaint();
 		}
 	}
@@ -85,8 +85,8 @@ public class DisplayNeuro extends javax.swing.JPanel {
 	}
 
 	static double fun(double d) {
-		return (Math.sin(4 * 3.14 * (d + 0.5)) - 0);
-//		return (Math.sin(4 * 3.14 * (d + 0.5)) - 4) / (Math.cos(d + 0.5) * Math.tan(d + 0.5));
+//		return (Math.sin(4 * 3.14 * (d + 0.5)) - 0);
+		return (Math.sin(4 * 3.14 * (d + 0.5)) - 4) / (Math.cos(d + 0.5) * Math.tan(d + 0.5));
 	}
 
 	@Override
@@ -94,8 +94,9 @@ public class DisplayNeuro extends javax.swing.JPanel {
 		// TODO Auto-generated method stub
 		super.paint(arg0);
 
+		System.out.println(fun(start) + " : " + oneFit.predict(new double[]{start}));
 		for (double x = start; x < end; x += step) {
-			double target = funcA(x);
+			double target = fun(x);
 			double output = oneFit.predict(new double[]{x});
 //			double output = autoNeuro.predict(new double[]{x})[0];
 //			System.out.println(target + " : " + output);

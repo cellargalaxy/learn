@@ -159,6 +159,7 @@ public class BpNeuro implements Neuro {
 	}
 
 	private double activation(double d) {
-		return 1 / (1 + Math.pow(Math.E, -d));
+		return Math.log(d * d + 1) / Math.log(Math.E) / Math.atan(d);
+//		return 1 / (1 + Math.pow(Math.E, -d));
 	}
 }
